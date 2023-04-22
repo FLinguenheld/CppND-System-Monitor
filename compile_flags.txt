@@ -1,0 +1,5 @@
+-Wall
+-std=c++17
+--include-directory=./include
+--include-directory=./src
+-lfmt
