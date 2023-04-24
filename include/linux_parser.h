@@ -11,28 +11,23 @@
 #include <string>
 
 
-class LinuxParser
-{
-    public:
-        enum class Path{
-            // kProcDirectory,
-            kCmdlineFilename,
-            kCpuinfoFilename,
-            kStatusFilename,
-            kStatFilename,
-            kUptimeFilename,
-            kMeminfoFilename,
-            kVersionFilename,
-            kOSPath,
-            kPasswordPath,
-        };
+namespace LinuxParser {
 
-        std::string parse(Path p, int position, std::string separator);
-        std::string parse(Path p, const std::string &grep, int position, std::string separator);
+    // Paths
+    const std::string kCmdlineFilename{"/proc/cmdline"};
+    const std::string kCpuinfoFilename{"/proc/cpuinfo"};
+    const std::string kStatusFilename{"/proc/status"};
+    const std::string kStatFilename{"/proc/stat"};
+    const std::string kUptimeFilename{"/proc/uptime"};
+    const std::string kMeminfoFilename{"/proc/meminfo"};
+    const std::string kVersionFilename{"/proc/version"};
+    const std::string kOSPath{"/etc/os-release"};
+    const std::string kPasswordPath{"/etc/passwd"};
 
-    private:
-        std::string cut_line(std::string line, int field, std::string delimiter=" ");
-        std::string path(LinuxParser::Path p) const;
-};
+    std::string parse(const std::string &path, int position, std::string separator);
+    std::string parse(const std::string &path, const std::string &grep, int position, std::string separator);
+    std::string cut_line(std::string line, int field, std::string delimiter=" ");
+
+};  // namespace LinuxParser
 
 #endif

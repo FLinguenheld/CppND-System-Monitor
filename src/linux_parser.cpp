@@ -36,9 +36,9 @@ std::string LinuxParser::cut_line(std::string line, int field, std::string delim
     }
 }
 
-std::string LinuxParser::parse(Path p, int position, std::string separator)
+std::string LinuxParser::parse(const std::string &path, int position, std::string separator)
 {
-    std::ifstream ifs(path(p));
+    std::ifstream ifs(path);
 
     std::string line;
     std::getline(ifs, line);
@@ -46,9 +46,9 @@ std::string LinuxParser::parse(Path p, int position, std::string separator)
     return cut_line(line, position, separator);
 }
 
-std::string LinuxParser::parse(Path p, const std::string &grep, int position, std::string separator)
+std::string LinuxParser::parse(const std::string &path, const std::string &grep, int position, std::string separator)
 {
-    std::ifstream ifs(path(p));
+    std::ifstream ifs(path);
 
     std::string line;
     while (std::getline(ifs, line)) {
@@ -58,31 +58,4 @@ std::string LinuxParser::parse(Path p, const std::string &grep, int position, st
     }
 
     return std::string();
-}
-
-
-std::string LinuxParser::path(LinuxParser::Path p) const
-{
-    switch (p) {
-        // case Path::kProcDirectory : return "/proc/";
-        //     break;
-        case Path::kCmdlineFilename : return "/proc/cmdline";
-            break;
-        case Path::kCpuinfoFilename : return "/proc/cpuinfo";
-            break;
-        case Path::kStatusFilename : return "";
-            break;
-        case Path::kStatFilename : return "/proc/stat";
-            break;
-        case Path::kUptimeFilename : return "/proc/uptime";
-            break;
-        case Path::kMeminfoFilename : return "/proc/meminfo";
-            break;
-        case Path::kVersionFilename : return "/proc/version";
-            break;
-        case Path::kOSPath : return "/etc/os-release";
-            break;
-        case Path::kPasswordPath : return "/etc/passwd";
-            break;
-    }
 }
