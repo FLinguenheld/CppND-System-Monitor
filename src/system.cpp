@@ -24,10 +24,12 @@ Processor& System::Cpu() { return cpu_; }
 vector<Process>& System::Processes() { return processes_; }
 
 
-// TODO: Return the system's memory utilization
-float System::MemoryUtilization() { return 0.0; }
+float System::MemoryUtilization() { 
+    float total = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemTotal", 1));
+    float free = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemFree", 1));
 
-
+    return (total-free) / total;
+}
 long int System::UpTime() { 
     return std::stol(LinuxParser::parse(LinuxParser::kUptimeFilename, 0));
 }
@@ -41,5 +43,14 @@ std::string System::Kernel() {
     return LinuxParser::parse(LinuxParser::kVersionFilename, 2);
 }
 std::string System::OperatingSystem() {
+
+    auto total = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemTotal", 1));
+    auto free = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemFree", 1));
+
+    auto used = total - free;
+    return std::to_string( used * 100 / total);
+
+
+
     return LinuxParser::parse(LinuxParser::kOSPath, "PRETTY_NAME", 1, "\"");
 }
