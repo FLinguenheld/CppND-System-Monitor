@@ -36,17 +36,17 @@ std::string LinuxParser::cut_line(std::string line, int field, std::string delim
     }
 }
 
-std::string LinuxParser::parse(const std::string &path, int position, std::string separator)
+std::string LinuxParser::parse(const std::string &path, int position, std::string delimiter)
 {
     std::ifstream ifs(path);
 
     std::string line;
     std::getline(ifs, line);
 
-    return cut_line(line, position, separator);
+    return cut_line(line, position, delimiter);
 }
 
-std::string LinuxParser::parse(const std::string &path, const std::string &grep, int position, std::string separator)
+std::string LinuxParser::parse(const std::string &path, const std::string &grep, int position, std::string delimiter)
 {
     std::ifstream ifs(path);
 
@@ -54,7 +54,7 @@ std::string LinuxParser::parse(const std::string &path, const std::string &grep,
     while (std::getline(ifs, line)) {
 
         if ( line.find(grep) == 0 )
-            return cut_line(line, position, separator);
+            return cut_line(line, position, delimiter);
     }
 
     return std::string();

@@ -24,8 +24,8 @@ namespace LinuxParser {
     const std::string kOSPath{"/etc/os-release"};
     const std::string kPasswordPath{"/etc/passwd"};
 
-    std::string parse(const std::string &path, int position, std::string separator);
-    std::string parse(const std::string &path, const std::string &grep, int position, std::string separator);
+    std::string parse(const std::string &path, int position, std::string delimiter=" ");
+    std::string parse(const std::string &path, const std::string &grep, int position, std::string delimiter=" ");
     std::string cut_line(std::string line, int field, std::string delimiter=" ");
 
 };  // namespace LinuxParser
