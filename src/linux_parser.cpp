@@ -1,9 +1,3 @@
-#include <dirent.h>
-#include <unistd.h>
-#include <sstream>
-#include <string>
-#include <vector>
-
 #include "linux_parser.h"
 
 using std::stof;
@@ -11,106 +5,84 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-// DONE: An example of how to read data from the filesystem
-string LinuxParser::OperatingSystem() {
-  string line;
-  string key;
-  string value;
-  std::ifstream filestream(kOSPath);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
-      std::replace(line.begin(), line.end(), ' ', '_');
-      std::replace(line.begin(), line.end(), '=', ' ');
-      std::replace(line.begin(), line.end(), '"', ' ');
-      std::istringstream linestream(line);
-      while (linestream >> key >> value) {
-        if (key == "PRETTY_NAME") {
-          std::replace(value.begin(), value.end(), '_', ' ');
-          return value;
+
+std::string LinuxParser::cut_line(std::string line, int field, std::string delimiter)
+{
+    size_t s(0);
+    auto delim_field = std::vector<size_t>{0};
+
+    // Remove mutliple spaces if the delimiter is a space
+    if (delimiter == " ") {
+        std::string line_cleaned;
+        for (auto c : line) {
+            if (c != ' ' || line_cleaned.back() != ' ')
+                line_cleaned.push_back(c);
         }
-      }
+        line = line_cleaned;
     }
-  }
-  return value;
-}
 
-// DONE: An example of how to read data from the filesystem
-string LinuxParser::Kernel() {
-  string os, kernel, version;
-  string line;
-  std::ifstream stream(kProcDirectory + kVersionFilename);
-  if (stream.is_open()) {
-    std::getline(stream, line);
-    std::istringstream linestream(line);
-    linestream >> os >> version >> kernel;
-  }
-  return kernel;
-}
-
-// BONUS: Update this to use std::filesystem
-vector<int> LinuxParser::Pids() {
-  vector<int> pids;
-  DIR* directory = opendir(kProcDirectory.c_str());
-  struct dirent* file;
-  while ((file = readdir(directory)) != nullptr) {
-    // Is this a directory?
-    if (file->d_type == DT_DIR) {
-      // Is every character of the name a digit?
-      string filename(file->d_name);
-      if (std::all_of(filename.begin(), filename.end(), isdigit)) {
-        int pid = stoi(filename);
-        pids.push_back(pid);
-      }
+    // Get all delimiter positions
+    while (s != std::string::npos && delim_field.size() < field + 2) {
+        s = line.find(delimiter, s+1);
+        delim_field.push_back(s);
     }
-  }
-  closedir(directory);
-  return pids;
+
+    if (field >= delim_field.size()) {
+        return std::string();
+    } else {
+        auto start = field == 0 ? 0 : delim_field[field] + delimiter.length();
+        auto length = field == 0 ? delim_field[field+1] : delim_field[field+1] - delim_field[field] - 1;
+        return line.substr(start, length);
+    }
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+std::string LinuxParser::parse(Path p, int position, std::string separator)
+{
+    std::ifstream ifs(path(p));
 
-// TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+    std::string line;
+    std::getline(ifs, line);
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+    return cut_line(line, position, separator);
+}
 
-// TODO: Read and return the number of active jiffies for a PID
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+std::string LinuxParser::parse(Path p, const std::string &grep, int position, std::string separator)
+{
+    std::ifstream ifs(path(p));
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+    std::string line;
+    while (std::getline(ifs, line)) {
 
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+        if ( line.find(grep) == 0 )
+            return cut_line(line, position, separator);
+    }
 
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+    return std::string();
+}
 
-// TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
 
-// TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
-
-// TODO: Read and return the command associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid[[maybe_unused]]) { return string(); }
-
-// TODO: Read and return the memory used by a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid[[maybe_unused]]) { return string(); }
-
-// TODO: Read and return the user ID associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid[[maybe_unused]]) { return string(); }
-
-// TODO: Read and return the user associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
-
-// TODO: Read and return the uptime of a process
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }
+std::string LinuxParser::path(LinuxParser::Path p) const
+{
+    switch (p) {
+        // case Path::kProcDirectory : return "/proc/";
+        //     break;
+        case Path::kCmdlineFilename : return "/proc/cmdline";
+            break;
+        case Path::kCpuinfoFilename : return "/proc/cpuinfo";
+            break;
+        case Path::kStatusFilename : return "";
+            break;
+        case Path::kStatFilename : return "/proc/stat";
+            break;
+        case Path::kUptimeFilename : return "/proc/uptime";
+            break;
+        case Path::kMeminfoFilename : return "/proc/meminfo";
+            break;
+        case Path::kVersionFilename : return "/proc/version";
+            break;
+        case Path::kOSPath : return "/etc/os-release";
+            break;
+        case Path::kPasswordPath : return "/etc/passwd";
+            break;
+    }
+}
