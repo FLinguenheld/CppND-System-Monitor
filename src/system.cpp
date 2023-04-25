@@ -19,6 +19,9 @@ You need to properly format the uptime. Refer to the comments mentioned in forma
 
 // TODO: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
+// Processor& System::Cpu() {
+
+// }
 
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() { return processes_; }
@@ -43,14 +46,5 @@ std::string System::Kernel() {
     return LinuxParser::parse(LinuxParser::kVersionFilename, 2);
 }
 std::string System::OperatingSystem() {
-
-    auto total = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemTotal", 1));
-    auto free = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemFree", 1));
-
-    auto used = total - free;
-    return std::to_string( used * 100 / total);
-
-
-
     return LinuxParser::parse(LinuxParser::kOSPath, "PRETTY_NAME", 1, "\"");
 }

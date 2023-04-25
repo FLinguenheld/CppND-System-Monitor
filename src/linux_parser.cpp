@@ -6,10 +6,11 @@ using std::to_string;
 using std::vector;
 
 
-std::string LinuxParser::cut_line(std::string line, int field, std::string delimiter)
+std::vector<std::string> LinuxParser::cut_line(std::string line, std::vector<int> desired_fields, std::string delimiter)
 {
-    size_t s(0);
-    auto delim_field = std::vector<size_t>{0};
+    std::vector<std::string> results;
+    auto delim_positions = std::vector<size_t>{0};
+    auto highest_field = std::max_element(desired_fields.begin(), desired_fields.end());
 
     // Remove mutliple spaces if the delimiter is a space
     if (delimiter == " ") {
@@ -21,20 +22,32 @@ std::string LinuxParser::cut_line(std::string line, int field, std::string delim
         line = line_cleaned;
     }
 
-    // Get all delimiter positions
-    while (s != std::string::npos && delim_field.size() < field + 2) {
+    // Get all delimiter positions (get rid of useless fields)
+    size_t s(0);
+    while (s != std::string::npos && delim_positions.size() < *highest_field + 2) {
         s = line.find(delimiter, s+1);
-        delim_field.push_back(s);
+        delim_positions.push_back(s);
     }
 
-    if (field >= delim_field.size()) {
-        return std::string();
-    } else {
-        auto start = field == 0 ? 0 : delim_field[field] + delimiter.length();
-        auto length = field == 0 ? delim_field[field+1] : delim_field[field+1] - delim_field[field] - 1;
-        return line.substr(start, length);
+    // Feed from desired
+    for (auto f : desired_fields) {
+        if (f >= delim_positions.size()) {
+            results.push_back(std::string());
+        } else {
+            auto start = f == 0 ? 0 : delim_positions[f] + delimiter.length();
+            auto length = f == 0 ? delim_positions[f+1] : delim_positions[f+1] - delim_positions[f] - 1;
+            results.push_back(line.substr(start, length));
+        }
     }
+
+    return results;
 }
+
+std::string LinuxParser::cut_line(std::string line, int field, std::string delimiter)
+{
+    return cut_line(line, std::vector<int>{field}, delimiter)[0];
+}
+
 
 std::string LinuxParser::parse(const std::string &path, int position, std::string delimiter)
 {

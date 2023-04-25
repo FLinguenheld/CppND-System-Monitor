@@ -26,6 +26,7 @@ namespace LinuxParser {
 
     std::string parse(const std::string &path, int position, std::string delimiter=" ");
     std::string parse(const std::string &path, const std::string &grep, int position, std::string delimiter=" ");
+    std::vector<std::string> cut_line(std::string line, std::vector<int> fields, std::string delimiter=" ");
     std::string cut_line(std::string line, int field, std::string delimiter=" ");
 
 };  // namespace LinuxParser
