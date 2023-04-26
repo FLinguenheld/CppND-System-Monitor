@@ -1,27 +1,26 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
+#include <vector>
+#include <unistd.h>
+#include "linux_parser.h"
+
+
 class Processor {
- public:
+    public:
+        /* Parse and calcul the system utilization twice to return the current cpu usage percentage */
+        float Utilization();
 
-    Processor();
-    Processor(int user, int nice, int system, int idle, int iowait, int irq,
-                        int softirq, int steal, int guest, int guest_nice);
+    private:
 
-  float Utilization();
+        /* Parse '/proc/stat' and calcul total & idle. */
+        void update_values(float &total, float &idle);
 
-  // TODO: Declare any necessary private members
- private:
-    int _user;
-    int _nice;
-    int _system;
-    int _idle;
-    int _iowait;
-    int _irq;
-    int _softirq;
-    int _steal;
-    int _guest;
-    int _guest_nice;
+        float _total_1;
+        float _idle_1;
+
+        float _total_2;
+        float _idle_2;
 };
 
 #endif

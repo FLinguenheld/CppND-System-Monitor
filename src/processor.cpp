@@ -1,26 +1,31 @@
 #include "processor.h"
 
-Processor::Processor()
-{};
 
-Processor::Processor(int user, int nice, int system, int idle, int iowait, int irq,
-                    int softirq, int steal, int guest, int guest_nice) :
-                        _user(user), _nice(nice), _system(system), _idle(idle), _iowait(iowait), _irq(irq),
-                        _softirq(softirq), _steal(steal), _guest(guest), _guest_nice(guest_nice)
-{};
+float Processor::Utilization()
+{
+    update_values(_total_1, _idle_1);
+    usleep(100000);
+    update_values(_total_2, _idle_2);
 
-float Processor::Utilization() {
+    float totald = _total_2 - _total_1;
+    float idled = _idle_2 - _idle_1;
 
-    // Guest time is already accounted in usertime
-    _user = _user - _guest;
-    _nice = _nice - _guest;
-    // Fields existing on kernels >= 2.6
-    // (and RHEL's patched kernel 2.4...)
-    unsigned long long int idlealltime = _idle + _iowait;
-    unsigned long long int systemalltime = _system + _irq + _softirq;
-    unsigned long long int virtalltime = _guest + _guest_nice;
-    unsigned long long int totaltime = _user + _nice + systemalltime + idlealltime + _steal + virtalltime;
-
-    return (totaltime - _idle) / totaltime;
-
+    return (totald - idled) / totald;
 }
+
+void Processor::update_values(float &total, float &idle)
+{
+    // Parse /proc/stat
+    auto vec = LinuxParser::parse(LinuxParser::kStatFilename, "cpu", {1, 2, 3, 4, 5, 6, 7});
+    std::vector<float> values;
+
+    for (auto v : vec)
+        values.push_back(std::stof(v));
+
+    // Calculs according to:
+    // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
+    idle = values[3] + values[4];
+    auto NonIdle = values[0] + values[1] + values[2] + values[5] + values[6] + values[7];
+    total = idle + NonIdle;
+}
+

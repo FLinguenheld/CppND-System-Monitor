@@ -1,33 +1,42 @@
-#ifndef SYSTEM_PARSER_H
-#define SYSTEM_PARSER_H
+#ifndef LINUX_PARSER_H
+#define LINUX_PARSER_H
 
-#include <dirent.h>
-#include <unistd.h>
-#include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <fstream>
-#include <regex>
-#include <string>
 
+using std::string;
+using std::vector;
 
 namespace LinuxParser {
 
     // Paths
-    const std::string kCmdlineFilename{"/proc/cmdline"};
-    const std::string kCpuinfoFilename{"/proc/cpuinfo"};
-    const std::string kStatusFilename{"/proc/status"};
-    const std::string kStatFilename{"/proc/stat"};
-    const std::string kUptimeFilename{"/proc/uptime"};
-    const std::string kMeminfoFilename{"/proc/meminfo"};
-    const std::string kVersionFilename{"/proc/version"};
-    const std::string kOSPath{"/etc/os-release"};
-    const std::string kPasswordPath{"/etc/passwd"};
+    const string kCmdlineFilename{"/proc/cmdline"};
+    const string kCpuinfoFilename{"/proc/cpuinfo"};
+    const string kStatusFilename{"/proc/status"};
+    const string kStatFilename{"/proc/stat"};
+    const string kUptimeFilename{"/proc/uptime"};
+    const string kMeminfoFilename{"/proc/meminfo"};
+    const string kVersionFilename{"/proc/version"};
+    const string kOSPath{"/etc/os-release"};
+    const string kPasswordPath{"/etc/passwd"};
 
-    std::string parse(const std::string &path, int position, std::string delimiter=" ");
-    std::string parse(const std::string &path, const std::string &grep, int position, std::string delimiter=" ");
-    std::vector<std::string> cut_line(std::string line, std::vector<int> fields, std::string delimiter=" ");
-    std::string cut_line(std::string line, int field, std::string delimiter=" ");
+    /*
+     * Open the file with the <path>, find the first line starting with <grep> and cut it with the <delimiter>.
+     * Then return all <desired fields>.
+     * Set empty strings if grep failed or desired_field(s) failed.
+    */
+    vector<string> parse(const string &path, const string &grep, vector<int> desired_fields, string delimiter=" ");
+    string parse(const string &path, const string &grep, int desired_field, string delimiter=" ");
+
+    /* Overload for single line files. */
+    vector<string> parse(const string &path, vector<int> desired_fields, string delimiter=" ");
+    string parse(const string &path, int desired_field, string delimiter=" ");
+
+    /* Cut the given <line> with the <delimiter> and return all <desired_fields>. */
+    vector<string> cut_line(string line, vector<int> desired_fields, string delimiter=" ");
+    string cut_line(string line, int desired_field, string delimiter=" ");
 
 };  // namespace LinuxParser
 
