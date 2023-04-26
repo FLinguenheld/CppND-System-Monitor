@@ -16,7 +16,7 @@ float Processor::Utilization()
 void Processor::update_values(float &total, float &idle)
 {
     // Parse /proc/stat
-    auto vec = LinuxParser::parse(LinuxParser::kStatFilename, "cpu", {1, 2, 3, 4, 5, 6, 7});
+    auto vec = LinuxParser::parse(LinuxParser::kStatFilename, "^cpu", {1, 2, 3, 4, 5, 6, 7});
     std::vector<float> values;
 
     for (auto v : vec)

@@ -11,9 +11,10 @@
 
 class System {
 public:
-    Processor& Cpu();
     std::vector<Process>& Processes();  // TODO: See src/system.cpp
-    float MemoryUtilization();          // TODO: See src/system.cpp
+
+    Processor& Cpu();
+    float MemoryUtilization();
 
     long UpTime();
 

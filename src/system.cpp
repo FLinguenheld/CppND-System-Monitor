@@ -4,6 +4,11 @@
 #include <string>
 #include <vector>
 
+#include <filesystem>
+#include <algorithm>
+// #include <cctype>
+
+
 #include "linux_parser.h"
 #include "process.h"
 #include "processor.h"
@@ -17,17 +22,36 @@ using std::vector;
 
 You need to properly format the uptime. Refer to the comments mentioned in format. cpp for formatting the uptime.*/
 
+
+// TODO: Return a container composed of the system's processes
+// vector<Process>& System::Processes() { return processes_; }
+vector<Process>& System::Processes() {
+
+    processes_.clear();
+    auto workspace = std::filesystem::path("/proc/");
+
+    for (auto const& dir_entry : std::filesystem::directory_iterator{workspace}) 
+    {
+        if ( dir_entry.is_directory() )
+        {
+            auto filename = dir_entry.path().filename().string();
+            if (std::all_of(filename.begin(), filename.end(), isdigit)) {
+                processes_.push_back(Process(filename));
+            }
+        }
+    }
+
+    return processes_;
+}
+
+
 Processor& System::Cpu() {
     return cpu_;
 }
 
-// TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
-
-
 float System::MemoryUtilization() { 
-    float total = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemTotal", 1));
-    float free = std::stol(LinuxParser::parse(LinuxParser::kMeminfoFilename, "MemFree", 1));
+    float total = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemTotal", 1));
+    float free = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemFree", 1));
 
     return (total-free) / total;
 }
@@ -35,14 +59,14 @@ long int System::UpTime() {
     return std::stol(LinuxParser::parse(LinuxParser::kUptimeFilename, 0));
 }
 int System::TotalProcesses() {
-    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "processes", 1));
+    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^processes", 1));
 }
 int System::RunningProcesses() {
-    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "procs_running", 1));
+    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^procs_running", 1));
 }
 std::string System::Kernel() {
     return LinuxParser::parse(LinuxParser::kVersionFilename, 2);
 }
 std::string System::OperatingSystem() {
-    return LinuxParser::parse(LinuxParser::kOSPath, "PRETTY_NAME", 1, "\"");
+    return LinuxParser::parse(LinuxParser::kOSPath, "^PRETTY_NAME", 1, "\"");
 }

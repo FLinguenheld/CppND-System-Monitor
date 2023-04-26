@@ -26,9 +26,10 @@ namespace LinuxParser {
      * Open the file with the <path>, find the first line starting with <grep> and cut it with the <delimiter>.
      * Then return all <desired fields>.
      * Set empty strings if grep failed or desired_field(s) failed.
+     * Add ^ on the grep argument to search lines which start by <grep>.
     */
-    vector<string> parse(const string &path, const string &grep, vector<int> desired_fields, string delimiter=" ");
-    string parse(const string &path, const string &grep, int desired_field, string delimiter=" ");
+    vector<string> parse(const string &path, string grep, vector<int> desired_fields, string delimiter=" ");
+    string parse(const string &path, string grep, int desired_field, string delimiter=" ");
 
     /* Overload for single line files. */
     vector<string> parse(const string &path, vector<int> desired_fields, string delimiter=" ");
