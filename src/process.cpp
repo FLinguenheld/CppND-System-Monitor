@@ -51,16 +51,23 @@ string Process::Command() {
     return LinuxParser::parse(_path + "/cmdline", 0);
 }
 
-// TODO: Return this process's memory utilization
-string Process::Ram() { return string(); }
+string Process::Ram() {
 
-// TODO: Return the user (name) that generated this process
+    auto ram = LinuxParser::parse(_path + "/status", "^VmSize:", 1);
+
+    if ( ram.length() ){
+        ram = to_string(std::stoi(ram) * 0.001);
+        return ram.substr(0, ram.find('.') + 3);
+    }
+
+    return string();
+}
+
 string Process::User() {
     auto uid = LinuxParser::parse(_path + "/status", "^Uid:", 1);
     return LinuxParser::parse("/etc/passwd", ":" + uid + ":", 0, ":");
 }
 
-// TODO: Return the age of this process (in seconds)
 long int Process::UpTime() {
 
     auto field = std::stol(LinuxParser::parse(_path + "/stat", 21));

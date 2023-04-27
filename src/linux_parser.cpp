@@ -12,7 +12,7 @@ vector<string> LinuxParser::parse(const string &path, string grep,
     std::ifstream ifs(path);
     while (std::getline(ifs, line)) {
 
-        if ( (on_start && line.find(grep) == 0) || (!on_start && line.find(grep)) )
+        if ( (on_start && line.find(grep) == 0) || (!on_start && line.find(grep) != std::string::npos) )
             return cut_line(line, desired_fields, delimiter);
     }
 
