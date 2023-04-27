@@ -36,12 +36,15 @@ vector<Process>& System::Processes() {
         {
             auto filename = dir_entry.path().filename().string();
             if (std::all_of(filename.begin(), filename.end(), isdigit)) {
-                processes_.push_back(Process(filename));
+                auto p = Process(filename);
+
+                if (!p.Command().empty() && !p.Ram().empty())
+                    processes_.push_back(Process(filename));
             }
         }
     }
 
-    std::sort(processes_.begin(), processes_.end());
+    std::sort(processes_.rbegin(), processes_.rend());
 
     return processes_;
 }

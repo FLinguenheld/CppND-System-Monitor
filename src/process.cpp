@@ -46,8 +46,11 @@ float Process::CpuUtilization() const {
 
         return cpu_usage;
     }
+    catch (const std::bad_alloc &ia) {
+        return 0.0;
+    }
     catch (const std::invalid_argument &ia) {
-        return 0.0F;
+        return 0.0;
     }
 }
 
@@ -60,7 +63,7 @@ string Process::Ram() const {
 
     if ( ram.length() ){
         ram = to_string(std::stoi(ram) * 0.001);
-        return ram.substr(0, ram.find('.') + 3);
+        return ram.substr(0, ram.find('.'));
     }
 
     return string();
@@ -79,11 +82,6 @@ long int Process::UpTime() {
     return sec;
 }
 
-// TODO: Overload the "less than" comparison operator for Process objects
-// REMOVE: [[maybe_unused]] once you define the function
-// bool Process::operator<(Process const& a[[maybe_unused]]) const { return false; }
 bool Process::operator<(Process const& a) const {
-    // return Pid() > a.Pid();
-    // return std::stof(Ram()) > std::stof(a.Ram());
-    return CpuUtilization() > a.CpuUtilization();
+    return CpuUtilization() < a.CpuUtilization();
 }
