@@ -1,8 +1,8 @@
 #include "linux_parser.h"
 
 
-vector<string> LinuxParser::parse(const string &path, string grep,
-                                  vector<int> desired_fields, string delimiter)
+vector<string> LinuxParser::parse(const string &path, string grep, vector<int> desired_fields,
+                                  string delimiter, string default_val)
 {
     bool on_start = grep[0] == '^';
     if (on_start)
@@ -13,33 +13,34 @@ vector<string> LinuxParser::parse(const string &path, string grep,
     while (std::getline(ifs, line)) {
 
         if ( (on_start && line.find(grep) == 0) || (!on_start && line.find(grep) != std::string::npos) )
-            return cut_line(line, desired_fields, delimiter);
+            return cut_line(line, desired_fields, delimiter, default_val);
     }
 
-    return vector<string> {desired_fields.size(), string()};
+    return vector<string> {desired_fields.size(), default_val};
 }
-string LinuxParser::parse(const string &path, string grep, int desired_field, string delimiter)
+string LinuxParser::parse(const string &path, string grep, int desired_field, string delimiter, string default_val)
 {
-    return LinuxParser::parse(path, grep, vector<int>{desired_field}, delimiter)[0];
+    return LinuxParser::parse(path, grep, vector<int>{desired_field}, delimiter, default_val)[0];
 }
 
 
-vector<string> LinuxParser::parse(const string &path, vector<int> desired_fields, string delimiter)
+vector<string> LinuxParser::parse(const string &path, vector<int> desired_fields,
+                                  string delimiter, string default_val)
 {
     std::ifstream ifs(path);
 
     string line;
     std::getline(ifs, line);
 
-    return cut_line(line, desired_fields, delimiter);
+    return cut_line(line, desired_fields, delimiter, default_val);
 }
-string LinuxParser::parse(const string &path, int desired_field, string delimiter)
+string LinuxParser::parse(const string &path, int desired_field, string delimiter, string default_val)
 {
-    return LinuxParser::parse(path, vector<int>{desired_field}, delimiter)[0];
+    return LinuxParser::parse(path, vector<int>{desired_field}, delimiter, default_val)[0];
 }
 
 
-vector<string> LinuxParser::cut_line(string line, vector<int> desired_fields, string delimiter)
+vector<string> LinuxParser::cut_line(string line, vector<int> desired_fields, string delimiter, string default_val)
 {
     vector<string> results;
     auto delim_positions = vector<size_t>{0};
@@ -67,7 +68,7 @@ vector<string> LinuxParser::cut_line(string line, vector<int> desired_fields, st
     // Feed from desired
     for (auto f : desired_fields) {
         if (f >= int(delim_positions.size())) {
-            results.push_back(string());
+            results.push_back(default_val);
         } else {
             auto start = f == 0 ? 0 : delim_positions[f] + delimiter.length();
             auto length = f == 0 ? delim_positions[f+1] : delim_positions[f+1] - delim_positions[f] - 1;
@@ -78,7 +79,7 @@ vector<string> LinuxParser::cut_line(string line, vector<int> desired_fields, st
     return results;
 }
 
-string LinuxParser::cut_line(string line, int desired_field, string delimiter)
+string LinuxParser::cut_line(string line, int desired_field, string delimiter, string default_val)
 {
-    return cut_line(line, vector<int>{desired_field}, delimiter)[0];
+    return cut_line(line, vector<int>{desired_field}, delimiter, default_val)[0];
 }

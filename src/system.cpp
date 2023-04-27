@@ -55,19 +55,19 @@ Processor& System::Cpu() {
 }
 
 float System::MemoryUtilization() { 
-    float total = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemTotal", 1));
-    float free = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemFree", 1));
+    float total = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemTotal", 1, " ", "0"));
+    float free = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemFree", 1, " ", "0"));
 
     return (total-free) / total;
 }
 long int System::UpTime() { 
-    return std::stol(LinuxParser::parse(LinuxParser::kUptimeFilename, 0));
+    return std::stol(LinuxParser::parse(LinuxParser::kUptimeFilename, 0, " ", "0"));
 }
 int System::TotalProcesses() {
-    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^processes", 1));
+    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^processes", 1, " ", "0"));
 }
 int System::RunningProcesses() {
-    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^procs_running", 1));
+    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^procs_running", 1, " ", "0"));
 }
 std::string System::Kernel() {
     return LinuxParser::parse(LinuxParser::kVersionFilename, 2);

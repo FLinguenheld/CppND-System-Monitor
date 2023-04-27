@@ -70,8 +70,8 @@ float Process::CpuUtilization() {
 
 void Process::update_process_values(float &utime, float &stime)
 {
-    std::vector<std::string> fields_process = LinuxParser::parse(_path + "/stat",
-                                                         std::vector<int>{13, 14});
+    std::vector<std::string> fields_process = LinuxParser::parse(_path + "/stat", std::vector<int>{13, 14},
+                                                                 " ", "0");
     utime = std::stof(fields_process[0]);
     stime = std::stof(fields_process[1]);
 }
@@ -79,7 +79,8 @@ void Process::update_process_values(float &utime, float &stime)
 void Process::update_proc_value(float &time_total)
 {
     std::vector<std::string> fields_cpu = LinuxParser::parse("/proc/stat",
-                                                         std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9});
+                                                             std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9},
+                                                             " ", "0");
     time_total = 0;
     for (auto f : fields_cpu)
         time_total += std::stof(f);
@@ -100,7 +101,7 @@ string Process::Command() {
 }
 
 string Process::Ram() const {
-    auto ram = LinuxParser::parse(_path + "/status", "^VmSize:", 1);
+    auto ram = LinuxParser::parse(_path + "/status", "^VmSize:", 1, " ", "0");
 
     if ( ram.length() ){
         ram = to_string(std::stoi(ram) * 0.001);
@@ -116,15 +117,15 @@ string Process::User() {
 }
 
 long int Process::UpTime() {
-    auto field = std::stol(LinuxParser::parse(_path + "/stat", 21));
+    auto field = std::stol(LinuxParser::parse(_path + "/stat", 21, " ", "0"));
     auto process_start = field / sysconf(_SC_CLK_TCK);
 
-    auto os_start = std::stol(LinuxParser::parse(LinuxParser::kUptimeFilename, 0));
+    auto os_start = std::stol(LinuxParser::parse(LinuxParser::kUptimeFilename, 0, " ", "0"));
 
     return os_start - process_start;
 }
 
 bool Process::operator<(Process const& a) const {
-    return Pid() < a.Pid();
+    // return Pid() < a.Pid();
     return _cpu_utilization > a._cpu_utilization;
 }
