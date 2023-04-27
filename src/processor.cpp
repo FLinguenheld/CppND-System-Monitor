@@ -4,7 +4,7 @@
 float Processor::Utilization()
 {
     update_values(_total_1, _idle_1);
-    usleep(100000);
+    usleep(50000);
     update_values(_total_2, _idle_2);
 
     float totald = _total_2 - _total_1;
@@ -28,4 +28,3 @@ void Processor::update_values(float &total, float &idle)
     auto NonIdle = values[0] + values[1] + values[2] + values[5] + values[6] + values[7];
     total = idle + NonIdle;
 }
-

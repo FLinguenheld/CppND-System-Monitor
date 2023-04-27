@@ -28,9 +28,9 @@ You need to properly format the uptime. Refer to the comments mentioned in forma
 vector<Process>& System::Processes() {
 
     processes_.clear();
-    auto workspace = std::filesystem::path("/proc/");
+    auto folder = std::filesystem::path("/proc/");
 
-    for (auto const& dir_entry : std::filesystem::directory_iterator{workspace}) 
+    for (auto const& dir_entry : std::filesystem::directory_iterator{folder}) 
     {
         if ( dir_entry.is_directory() )
         {
@@ -40,6 +40,8 @@ vector<Process>& System::Processes() {
             }
         }
     }
+
+    std::sort(processes_.begin(), processes_.end());
 
     return processes_;
 }
