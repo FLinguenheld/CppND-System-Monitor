@@ -3,15 +3,24 @@
 
 float Processor::Utilization()
 {
+    return _cpu_utilization;
+}
+
+
+void Processor::calcul_cpu_first()
+{
     update_values(_total_1, _idle_1);
-    usleep(50000);
+}
+void Processor::calcul_cpu_second()
+{
     update_values(_total_2, _idle_2);
 
     float totald = _total_2 - _total_1;
     float idled = _idle_2 - _idle_1;
 
-    return (totald - idled) / totald;
+    _cpu_utilization = (totald - idled) / totald;
 }
+
 
 void Processor::update_values(float &total, float &idle)
 {

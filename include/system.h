@@ -13,6 +13,7 @@ class System {
 public:
     std::vector<Process>& Processes();  // TODO: See src/system.cpp
 
+    void Update_cpu_and_processes();
     Processor& Cpu();
     float MemoryUtilization();
 

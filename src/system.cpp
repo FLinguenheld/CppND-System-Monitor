@@ -22,9 +22,12 @@ using std::vector;
 You need to properly format the uptime. Refer to the comments mentioned in format. cpp for formatting the uptime.*/
 
 
-// TODO: Return a container composed of the system's processes
-// vector<Process>& System::Processes() { return processes_; }
-vector<Process>& System::Processes() {
+// Calculs for processes and cpu !
+void System::Update_cpu_and_processes()
+{
+
+    cpu_.calcul_cpu_first();
+
 
     processes_.clear();
     auto folder = std::filesystem::path("/proc/");
@@ -52,6 +55,17 @@ vector<Process>& System::Processes() {
         p.calcul_cpu_second();
 
     std::sort(processes_.rbegin(), processes_.rend());
+
+    cpu_.calcul_cpu_second();
+
+}
+
+
+
+
+// TODO: Return a container composed of the system's processes
+// vector<Process>& System::Processes() { return processes_; }
+vector<Process>& System::Processes() {
     return processes_;
 }
 
