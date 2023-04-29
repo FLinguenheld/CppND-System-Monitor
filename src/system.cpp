@@ -14,7 +14,6 @@
 #include "processor.h"
 #include "system.h"
 
-using std::set;
 using std::size_t;
 using std::string;
 using std::vector;
@@ -39,16 +38,22 @@ vector<Process>& System::Processes() {
                 auto p = Process(filename);
 
                 if (!p.Command().empty() && !p.Ram().empty())
-                    processes_.push_back(Process(filename));
+                {
+                    p.calcul_cpu_first(); // Cpu % has to be calculed twice after a break
+                    processes_.push_back(p);
+                }
             }
         }
     }
 
-    std::sort(processes_.rbegin(), processes_.rend());
+    // Break then finish calculating cpu utilization for all processes
+    usleep(1200000);
+    for (auto &p : processes_)
+        p.calcul_cpu_second();
 
+    std::sort(processes_.rbegin(), processes_.rend());
     return processes_;
 }
-
 
 Processor& System::Cpu() {
     return cpu_;
