@@ -5,17 +5,18 @@
 #include "linux_parser.h"
 
 
+/*
+ * Class for the CPU, it allows to calculate the current utilization.
+ * Use methods <calcul_first> then <calcul_second> after one second break to set the cpu utilization.
+ */
 class Processor {
     public:
-        /* Parse and calcul the system utilization twice to return the current cpu usage percentage */
-        float Utilization();
+        float Utilization() const;
 
-        void calcul_cpu_first();
-        void calcul_cpu_second();
+        void calcul_first();
+        void calcul_second();
 
     private:
-
-        /* Parse '/proc/stat' and calcul total & idle. */
         void update_values(float &total, float &idle);
 
         float _total_1;

@@ -26,7 +26,7 @@ You need to properly format the uptime. Refer to the comments mentioned in forma
 void System::Update_cpu_and_processes()
 {
 
-    cpu_.calcul_cpu_first();
+    cpu_.calcul_first();
 
 
     processes_.clear();
@@ -56,8 +56,7 @@ void System::Update_cpu_and_processes()
 
     std::sort(processes_.rbegin(), processes_.rend());
 
-    cpu_.calcul_cpu_second();
-
+    cpu_.calcul_second();
 }
 
 
