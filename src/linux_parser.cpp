@@ -46,6 +46,9 @@ vector<string> LinuxParser::cut_line(string line, vector<int> desired_fields, st
     auto delim_positions = vector<size_t>{0};
     auto highest_field = std::max_element(desired_fields.begin(), desired_fields.end());
 
+    // \0 causes troubles (with /proc/pid/cmdline for instance)
+    std::replace(line.begin(), line.end(), '\0', ' ');
+
     // Remove mutliple spaces if the delimiter is a space
     if (delimiter == " ") {
         string line_cleaned;
@@ -58,11 +61,15 @@ vector<string> LinuxParser::cut_line(string line, vector<int> desired_fields, st
         line = line_cleaned;
     }
 
-    // Get all delimiter positions (get rid of useless fields)
-    size_t s(0);
-    while (s != string::npos && int(delim_positions.size()) < *highest_field + 2) {
-        s = line.find(delimiter, s+1);
-        delim_positions.push_back(s);
+    if (delimiter.empty()) {        // Take the entire line
+            delim_positions.push_back(line.size());
+    } else {
+        // Get all delimiter positions (get rid of useless fields)
+        size_t s(0);
+        while (s != string::npos && int(delim_positions.size()) < *highest_field + 2) {
+            s = line.find(delimiter, s+1);
+            delim_positions.push_back(s);
+        }
     }
 
     // Feed from desired

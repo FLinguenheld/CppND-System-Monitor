@@ -12,13 +12,14 @@ using std::vector;
 namespace LinuxParser {
 
     // Paths
-    const string kCmdlineFilename{"/proc/cmdline"};
-    const string kCpuinfoFilename{"/proc/cpuinfo"};
-    const string kStatusFilename{"/proc/status"};
-    const string kStatFilename{"/proc/stat"};
-    const string kUptimeFilename{"/proc/uptime"};
-    const string kMeminfoFilename{"/proc/meminfo"};
-    const string kVersionFilename{"/proc/version"};
+    const string kProcDirectory{"/proc/"};
+    const string kCmdlineFilename{"cmdline"};
+    const string kCpuinfoFilename{"cpuinfo"};
+    const string kStatusFilename{"status"};
+    const string kStatFilename{"stat"};
+    const string kUptimeFilename{"uptime"};
+    const string kMeminfoFilename{"meminfo"};
+    const string kVersionFilename{"version"};
     const string kOSPath{"/etc/os-release"};
     const string kPasswordPath{"/etc/passwd"};
 
@@ -27,6 +28,7 @@ namespace LinuxParser {
      * Then return all <desired fields>.
      * Set the <default_val> strings if grep failed or desired_field(s) failed.
      * Add ^ on the grep argument to search lines which start by <grep>.
+     * Set an empty <delimiter> to take the entire line.
     */
     vector<string> parse(const string &path, string grep, vector<int> desired_fields,
                          string delimiter=" ", string default_val="");

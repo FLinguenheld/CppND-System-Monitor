@@ -12,18 +12,19 @@ using std::string;
 /*
  * Basic class for Process representation
  * It contains relevant attributes as shown below
+ * Use methods <calcul_first> then <calcul_second> after one second break to set the cpu utilization.
 */
 class Process {
     public:
         Process(string pid);
 
         int Pid() const;
-        string User();
-        string Command();
+        string User() const;
+        string Command() const;
         string Ram() const;
-        long int UpTime();
+        long int UpTime() const;
 
-        float CpuUtilization();
+        float CpuUtilization() const;
         void calcul_cpu_first();
         void calcul_cpu_second();
 
@@ -34,15 +35,10 @@ class Process {
         string _path;
 
         void update_process_values(float &utime, float &stime);
-        float _utime_0;
-        float _utime_1;
-
-        float _stime_0;
-        float _stime_1;
-
         void update_proc_value(float &time_total);
+        float _utime_0;
+        float _stime_0;
         float _time_total_0;
-        float _time_total_1;
 
         float _cpu_utilization;
 };

@@ -50,7 +50,7 @@ void System::Update_cpu_and_processes()
     }
 
     // Break then finish calculating cpu utilization for all processes
-    usleep(1200000);
+    usleep(1500000);
     for (auto &p : processes_)
         p.calcul_cpu_second();
 
