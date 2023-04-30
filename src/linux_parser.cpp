@@ -8,12 +8,15 @@ vector<string> LinuxParser::parse(const string &path, string grep, vector<int> d
     if (on_start)
         grep = grep.substr(1, grep.size()-1);
 
-    string line;
     std::ifstream ifs(path);
-    while (std::getline(ifs, line)) {
+    if (!ifs.fail())
+    {
+        string line;
+        while (std::getline(ifs, line)) {
 
-        if ( (on_start && line.find(grep) == 0) || (!on_start && line.find(grep) != std::string::npos) )
-            return cut_line(line, desired_fields, delimiter, default_val);
+            if ( (on_start && line.find(grep) == 0) || (!on_start && line.find(grep) != std::string::npos) )
+                return cut_line(line, desired_fields, delimiter, default_val);
+        }
     }
 
     return vector<string> {desired_fields.size(), default_val};
@@ -28,11 +31,15 @@ vector<string> LinuxParser::parse(const string &path, vector<int> desired_fields
                                   string delimiter, string default_val)
 {
     std::ifstream ifs(path);
+    if (!ifs.fail())
+    {
+        string line;
+        std::getline(ifs, line);
 
-    string line;
-    std::getline(ifs, line);
+        return cut_line(line, desired_fields, delimiter, default_val);
+    }
 
-    return cut_line(line, desired_fields, delimiter, default_val);
+    return vector<string> {desired_fields.size(), default_val};
 }
 string LinuxParser::parse(const string &path, int desired_field, string delimiter, string default_val)
 {

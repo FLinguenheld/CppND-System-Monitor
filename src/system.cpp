@@ -30,7 +30,7 @@ void System::Update_cpu_and_processes()
 
 
     processes_.clear();
-    auto folder = std::filesystem::path("/proc/");
+    auto folder = std::filesystem::path(LinuxParser::kProcDirectory);
 
     for (auto const& dir_entry : std::filesystem::directory_iterator{folder}) 
     {
@@ -73,22 +73,25 @@ Processor& System::Cpu() {
 }
 
 float System::MemoryUtilization() { 
-    float total = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemTotal", 1, " ", "0"));
-    float free = std::stof(LinuxParser::parse(LinuxParser::kMeminfoFilename, "^MemFree", 1, " ", "0"));
-
+    float total = std::stof(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kMeminfoFilename,
+                                               "^MemTotal", 1, " ", "0.0"));
+    float free = std::stof(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kMeminfoFilename,
+                                              "^MemFree", 1, " ", "0.0"));
     return (total-free) / total;
 }
 long int System::UpTime() { 
-    return std::stol(LinuxParser::parse(LinuxParser::kUptimeFilename, 0, " ", "0"));
+    return std::stol(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kUptimeFilename, 0, " ", "0"));
 }
 int System::TotalProcesses() {
-    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^processes", 1, " ", "0"));
+    return std::stoi(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kStatFilename,
+                                        "^processes", 1, " ", "0"));
 }
 int System::RunningProcesses() {
-    return std::stoi(LinuxParser::parse(LinuxParser::kStatFilename, "^procs_running", 1, " ", "0"));
+    return std::stoi(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kStatFilename,
+                                        "^procs_running", 1, " ", "0"));
 }
 std::string System::Kernel() {
-    return LinuxParser::parse(LinuxParser::kVersionFilename, 2);
+    return LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kVersionFilename, 2);
 }
 std::string System::OperatingSystem() {
     return LinuxParser::parse(LinuxParser::kOSPath, "^PRETTY_NAME", 1, "\"");
