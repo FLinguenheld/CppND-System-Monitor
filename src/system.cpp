@@ -1,35 +1,17 @@
-#include <unistd.h>
-#include <cstddef>
-#include <set>
-#include <string>
-#include <vector>
-
-#include <filesystem>
-#include <algorithm>
-// #include <cctype>
-
-
-#include "linux_parser.h"
-#include "process.h"
-#include "processor.h"
 #include "system.h"
 
-using std::size_t;
-using std::string;
-using std::vector;
-/*You need to complete the mentioned TODOs in order to satisfy the rubric criteria "The student will be able to extract and display basic data about the system."
 
-You need to properly format the uptime. Refer to the comments mentioned in format. cpp for formatting the uptime.*/
+vector<Process>& System::Processes() {
+    return _processes;
+}
+Processor& System::Cpu() {
+    return _cpu;
+}
 
-
-// Calculs for processes and cpu !
-void System::Update_cpu_and_processes()
+// --
+void System::Update_cpu_and_processes(int break_usec)
 {
-
-    cpu_.calcul_first();
-
-
-    processes_.clear();
+    _processes.clear();
     auto folder = std::filesystem::path(LinuxParser::kProcDirectory);
 
     for (auto const& dir_entry : std::filesystem::directory_iterator{folder}) 
@@ -38,61 +20,53 @@ void System::Update_cpu_and_processes()
         {
             auto filename = dir_entry.path().filename().string();
             if (std::all_of(filename.begin(), filename.end(), isdigit)) {
-                auto p = Process(filename);
+                auto new_process = Process(filename);
 
-                if (!p.Command().empty() && !p.Ram().empty())
+                if (!new_process.Command().empty() && !new_process.Ram().empty())
                 {
-                    p.calcul_cpu_first(); // Cpu % has to be calculed twice after a break
-                    processes_.push_back(p);
+                    new_process.calcul_cpu_first();
+                    _processes.push_back(new_process);
                 }
             }
         }
     }
 
-    // Break then finish calculating cpu utilization for all processes
-    usleep(1500000);
-    for (auto &p : processes_)
+    _cpu.calcul_first();
+
+    // Break then finish calculating cpu utilizations
+    usleep(break_usec);
+
+    for (auto &p : _processes)
         p.calcul_cpu_second();
 
-    std::sort(processes_.rbegin(), processes_.rend());
+    std::sort(_processes.rbegin(), _processes.rend());
 
-    cpu_.calcul_second();
+    _cpu.calcul_second();
 }
 
-
-
-
-// TODO: Return a container composed of the system's processes
-// vector<Process>& System::Processes() { return processes_; }
-vector<Process>& System::Processes() {
-    return processes_;
-}
-
-Processor& System::Cpu() {
-    return cpu_;
-}
-
-float System::MemoryUtilization() { 
+// --
+float System::MemoryUtilization() const { 
     float total = std::stof(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kMeminfoFilename,
                                                "^MemTotal", 1, " ", "0.0"));
     float free = std::stof(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kMeminfoFilename,
                                               "^MemFree", 1, " ", "0.0"));
     return (total-free) / total;
 }
-long int System::UpTime() { 
+long int System::UpTime() const { 
     return std::stol(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kUptimeFilename, 0, " ", "0"));
 }
-int System::TotalProcesses() {
+int System::TotalProcesses() const {
     return std::stoi(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kStatFilename,
                                         "^processes", 1, " ", "0"));
 }
-int System::RunningProcesses() {
+int System::RunningProcesses() const {
     return std::stoi(LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kStatFilename,
                                         "^procs_running", 1, " ", "0"));
 }
-std::string System::Kernel() {
+
+std::string System::Kernel() const {
     return LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kVersionFilename, 2);
 }
-std::string System::OperatingSystem() {
+std::string System::OperatingSystem() const {
     return LinuxParser::parse(LinuxParser::kOSPath, "^PRETTY_NAME", 1, "\"");
 }

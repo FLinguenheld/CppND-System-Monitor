@@ -1,34 +1,40 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include <string>
-#include <vector>
 
 #include "process.h"
 #include "processor.h"
-#include "linux_parser.h"
+
+#include <filesystem>
+#include <algorithm>
+
+using std::string;
+using std::vector;
 
 
+/*
+ * Class to manage cpu, processes and get general os information.
+ * Use <Update_cpu_and_processes> to refresh current cpu utilizations.
+ * This method has to do a break (at least one second) to get two measures.
+ */
 class System {
-public:
-    std::vector<Process>& Processes();  // TODO: See src/system.cpp
+    public:
+        std::vector<Process>& Processes();
+        Processor& Cpu();
 
-    void Update_cpu_and_processes();
-    Processor& Cpu();
-    float MemoryUtilization();
+        void Update_cpu_and_processes(int break_usec=1500000);
 
-    long UpTime();
+        float MemoryUtilization() const;
+        long UpTime() const;
+        int TotalProcesses() const;
+        int RunningProcesses() const;
 
-    int TotalProcesses();
-    int RunningProcesses();
+        std::string Kernel() const;
+        std::string OperatingSystem() const;
 
-    std::string Kernel();
-    std::string OperatingSystem();
-
-    // TODO: Define any necessary private members
-private:
-    Processor cpu_;
-    std::vector<Process> processes_ = {};
+    private:
+        Processor _cpu;
+        std::vector<Process> _processes = {};
 };
 
 #endif
