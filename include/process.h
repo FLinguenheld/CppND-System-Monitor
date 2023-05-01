@@ -10,6 +10,27 @@
 using std::string;
 
 
+class ProcessCPU {
+
+    public:
+        ProcessCPU(const string &path);
+
+        float CpuUtilization() const;
+        void calcul_cpu_first();
+        void calcul_cpu_second();
+
+    private:
+        string _path;
+
+        void update_process_values(float &utime, float &stime);
+        void update_proc_value(float &time_total);
+        float _utime_0;
+        float _stime_0;
+        float _time_total_0;
+
+        float _cpu_utilization;
+};
+
 /*
  * Basic class for Process representation
  * It contains relevant attributes as shown below
@@ -34,6 +55,8 @@ class Process {
     private:
         string _pid;
         string _path;
+
+        ProcessCPU _cpu;
 
         void update_process_values(float &utime, float &stime);
         void update_proc_value(float &time_total);

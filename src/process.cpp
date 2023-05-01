@@ -1,11 +1,19 @@
 #include "process.h"
 
+
 using std::to_string;
 using std::vector;
 
+ProcessCPU::ProcessCPU(const string &path) : _path(path)
+{}
 
-Process::Process(string pid) : _pid(pid), _path(LinuxParser::kProcDirectory + pid + "/"), _utime_0(0.0),
-                               _stime_0(0.0), _time_total_0(0.0), _cpu_utilization(0.0)
+
+
+
+
+Process::Process(string pid) : _pid(pid), _path(LinuxParser::kProcDirectory + pid + "/"), _cpu(_path),
+                               _utime_0(0.0), _stime_0(0.0), _time_total_0(0.0),
+                               _cpu_utilization(0.0)
 {};
 
 int Process::Pid() const {
