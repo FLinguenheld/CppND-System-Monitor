@@ -22,9 +22,9 @@ void System::Update_cpu_and_processes(int break_usec)
             if (std::all_of(filename.begin(), filename.end(), isdigit)) {
                 auto new_process = Process(filename);
 
-                if (!new_process.Command().empty() && !new_process.Ram().empty())
+                if (!new_process.Command().empty())
                 {
-                    new_process.calcul_cpu_first();
+                    new_process.Cpu().calcul_first();
                     _processes.push_back(new_process);
                 }
             }
@@ -37,7 +37,7 @@ void System::Update_cpu_and_processes(int break_usec)
     usleep(break_usec);
 
     for (auto &p : _processes)
-        p.calcul_cpu_second();
+        p.Cpu().calcul_second();
 
     std::sort(_processes.rbegin(), _processes.rend());
 
