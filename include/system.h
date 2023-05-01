@@ -3,7 +3,7 @@
 
 
 #include "process.h"
-#include "processor.h"
+#include "cpu.h"
 
 #include <filesystem>
 #include <algorithm>
@@ -20,7 +20,7 @@ using std::vector;
 class System {
     public:
         std::vector<Process>& Processes();
-        Processor& Cpu();
+        CPU& Cpu();
 
         void Update_cpu_and_processes(int break_usec=1500000);
 
@@ -33,7 +33,7 @@ class System {
         std::string OperatingSystem() const;
 
     private:
-        Processor _cpu;
+        CPU _cpu;
         std::vector<Process> _processes = {};
 };
 

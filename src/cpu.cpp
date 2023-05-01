@@ -1,17 +1,22 @@
-#include "processor.h"
+#include "cpu.h"
 
-
-Processor::Processor() : _total_0(0.0), _idle_0(0.0), _cpu_utilization(0.0)
+AbstractCPU::AbstractCPU() : _utilization(0.0)
 {}
 
-float Processor::Utilization() const {
-    return _cpu_utilization;
+float AbstractCPU::Utilization() const {
+    return _utilization;
 }
 
-void Processor::calcul_first() {
+
+
+CPU::CPU() : _total_0(0.0), _idle_0(0.0)
+{}
+
+
+void CPU::calcul_first() {
     update_values(_total_0, _idle_0);
 }
-void Processor::calcul_second()
+void CPU::calcul_second()
 {
     float total_1, idle_1;
     update_values(total_1, idle_1);
@@ -19,10 +24,10 @@ void Processor::calcul_second()
     float totald = total_1 - _total_0;
     float idled = idle_1 - _idle_0;
 
-    _cpu_utilization = (totald - idled) / totald;
+    _utilization = (totald - idled) / totald;
 }
 
-void Processor::update_values(float &total, float &idle)
+void CPU::update_values(float &total, float &idle)
 {
     auto vec = LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kStatFilename,
                                   "^cpu", {1, 2, 3, 4, 5, 6, 7}, " ", "0");

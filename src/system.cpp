@@ -4,7 +4,7 @@
 vector<Process>& System::Processes() {
     return _processes;
 }
-Processor& System::Cpu() {
+CPU& System::Cpu() {
     return _cpu;
 }
 
