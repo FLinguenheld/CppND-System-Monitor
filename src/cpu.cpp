@@ -1,6 +1,7 @@
 #include "cpu.h"
 
-AbstractCPU::AbstractCPU() : _utilization(0.0)
+AbstractCPU::AbstractCPU() : _proc_path(LinuxParser::kProcDirectory + LinuxParser::kStatFilename),
+                             _utilization(0.0)
 {}
 
 float AbstractCPU::Utilization() const {
@@ -8,10 +9,9 @@ float AbstractCPU::Utilization() const {
 }
 
 
-
-CPU::CPU() : _total_0(0.0), _idle_0(0.0)
+// ----
+CPU::CPU() : AbstractCPU(), _total_0(0.0), _idle_0(0.0)
 {}
-
 
 void CPU::calcul_first() {
     update_values(_total_0, _idle_0);
@@ -29,8 +29,7 @@ void CPU::calcul_second()
 
 void CPU::update_values(float &total, float &idle)
 {
-    auto vec = LinuxParser::parse(LinuxParser::kProcDirectory + LinuxParser::kStatFilename,
-                                  "^cpu", {1, 2, 3, 4, 5, 6, 7}, " ", "0");
+    auto vec = LinuxParser::parse(_proc_path, "^cpu", {1, 2, 3, 4, 5, 6, 7}, " ", "0");
     std::vector<float> values;
 
     for (auto v : vec)

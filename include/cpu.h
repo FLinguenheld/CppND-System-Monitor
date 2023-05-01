@@ -5,15 +5,21 @@
 #include "linux_parser.h"
 
 
+/*
+ * Base class for CPU
+ * Override <calcul_first> <calcul_second> to repeat two measures and calculate the current utilization.
+ */
 class AbstractCPU
 {
     public:
         AbstractCPU();
         float Utilization() const;
+
         virtual void calcul_first() = 0;
         virtual void calcul_second() = 0;
 
     protected:
+        string _proc_path;
         float _utilization;
 };
 

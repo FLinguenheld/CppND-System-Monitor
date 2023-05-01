@@ -4,7 +4,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "linux_parser.h"
+#include "cpu.h"
 
 using std::string;
 
@@ -13,25 +13,22 @@ using std::string;
  * Class for CPU Process representation
  * Use methods <calcul_first> then <calcul_second> after one second break to set the current utilization.
 */
-class ProcessCPU {
+class ProcessCPU : public AbstractCPU {
 
     public:
-        ProcessCPU(const string &path);
+        ProcessCPU(const string &pid_path);
 
-        float Utilization() const;
-        void calcul_first();
-        void calcul_second();
+        void calcul_first() override;
+        void calcul_second() override;
 
     private:
-        string _path;
+        string _pid_path;
 
         void update_process_values(float &utime, float &stime);
         void update_proc_value(float &time_total);
         float _utime_0;
         float _stime_0;
         float _time_total_0;
-
-        float _utilization;
 };
 
 #endif

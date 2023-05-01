@@ -1,9 +1,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-
-#include "process.h"
 #include "cpu.h"
+#include "process.h"
 
 #include <filesystem>
 #include <algorithm>
